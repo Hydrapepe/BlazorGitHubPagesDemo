@@ -1,0 +1,292 @@
+@page "/Cis/Preconf/ISP"
+!<br>
+! Last configuration change at 20:46:00 EET Sun Feb 28 2021 by cisco<br>
+!<br>
+version 15.7<br>
+service timestamps debug datetime msec<br>
+service timestamps log datetime msec<br>
+no service password-encryption<br>
+!<br>
+hostname ISP<br>
+!<br>
+boot-start-marker<br>
+boot-end-marker<br>
+!<br>
+username cisco priv 1 password 0 cisco<br>
+!<br>
+aaa new-model<br>
+!<br>
+!<br>
+aaa authentication login default local<br>
+aaa authentication ppp default local<br>
+aaa authorization network default local <br>
+!<br>
+!<br>
+!<br>
+!<br>
+!<br>
+aaa session-id common<br>
+!<br>
+!<br>
+!<br>
+clock timezone EET 2 0<br>
+mmi polling-interval 60<br>
+no mmi auto-configure<br>
+no mmi pvc<br>
+mmi snmp-timeout 180<br>
+!<br>
+!<br>
+!<br>
+!<br>
+!<br>
+!<br>
+!<br>
+!<br>
+!<br>
+!<br>
+!<br>
+!<br>
+!<br>
+!<br>
+!<br>
+!<br>
+ip vrf ISP1<br>
+ rd 1:1<br>
+ route-target export 1:1<br>
+ route-target export 2:2<br>
+ route-target import 1:1<br>
+ route-target import 2:2<br>
+!<br>
+ip vrf ISP2<br>
+ rd 2:2<br>
+ route-target export 1:1<br>
+ route-target export 2:2<br>
+ route-target import 1:1<br>
+ route-target import 2:2<br>
+!<br>
+!<br>
+!<br>
+!<br>
+no ip domain lookup<br>
+ip domain name worldskills.ru<br>
+ip cef<br>
+no ipv6 cef<br>
+!<br>
+multilink bundle-name authenticated<br>
+!<br>
+!<br>
+!<br>
+!<br>
+!<br>
+!<br>
+!<br>
+!<br>
+!<br>
+username cisco password 0 cisco<br>
+!<br>
+redundancy<br>
+!<br>
+!<br>
+! <br>
+!<br>
+!<br>
+!<br>
+!<br>
+!<br>
+!<br>
+!<br>
+!<br>
+!<br>
+!<br>
+!<br>
+!<br>
+interface Loopback0<br>
+ no shutdown<br>
+ ip vrf forwarding ISP1<br>
+ ip address 8.8.8.8 255.255.255.255<br>
+!<br>
+interface Loopback1<br>
+ no shutdown<br>
+ ip vrf forwarding ISP2<br>
+ ip address 78.88.8.8 255.255.255.255<br>
+!<br>
+interface Loopback2<br>
+ no shutdown<br>
+ ip address 11.11.11.11 255.255.255.255<br>
+!<br>
+interface Loopback3<br>
+ no shutdown<br>
+ ip address 22.22.22.22 255.255.255.255<br>
+!<br>
+interface Tunnel1<br>
+ no shutdown<br>
+ bandwidth 10000000<br>
+ ip vrf forwarding ISP1<br>
+ ip address 100.22.5.1 255.255.255.252<br>
+ no ip redirects<br>
+ ip mtu 9000<br>
+ tunnel source Loopback2<br>
+ tunnel destination 22.22.22.22<br>
+!<br>
+interface Tunnel2<br>
+ no shutdown<br>
+ bandwidth 10000000<br>
+ ip vrf forwarding ISP2<br>
+ ip address 100.22.5.2 255.255.255.252<br>
+ no ip redirects<br>
+ ip mtu 9000<br>
+ tunnel source Loopback3<br>
+ tunnel destination 11.11.11.11<br>
+!<br>
+interface Multilink1<br>
+ no shutdown<br>
+ ip vrf forwarding ISP1<br>
+ ip address 100.45.5.1 255.255.255.252<br>
+ peer default ip address pool PPP<br>
+ ppp multilink<br>
+ ppp multilink group 1<br>
+!<br>
+interface Ethernet0/0<br>
+ no shutdown<br>
+ description to FW1 E1 from ISP1<br>
+ ip vrf forwarding ISP1<br>
+ ip address 100.45.10.1 255.255.255.252<br>
+ duplex auto<br>
+!<br>
+interface Ethernet0/1<br>
+ no shutdown<br>
+ no ip address<br>
+ duplex auto<br>
+!<br>
+interface Ethernet0/1<br>
+description to FW1 E1 from ISP2<br>
+ip vrf forwarding ISP2<br>
+ip address 22.84.4.5 255.255.255.252<br>
+!<br>
+interface Ethernet0/2<br>
+ no shutdown<br>
+ no ip address<br>
+ shutdown<br>
+ duplex auto<br>
+!<br>
+interface Ethernet0/3<br>
+ no shutdown<br>
+ no ip address<br>
+ shutdown<br>
+ duplex auto<br>
+!<br>
+interface Serial1/0<br>
+ no shutdown<br>
+ description to BR1 from ISP1<br>
+ no ip address<br>
+ encapsulation ppp<br>
+ ppp multilink<br>
+ ppp multilink group 1<br>
+ serial restart-delay 0<br>
+ clock rate 64000<br>
+!<br>
+interface Serial1/1<br>
+ no shutdown<br>
+ description to BR1 from ISP1<br>
+ no ip address<br>
+ encapsulation ppp<br>
+ ppp multilink<br>
+ ppp multilink group 1<br>
+ serial restart-delay 0<br>
+ clock rate 64000<br>
+!<br>
+interface Serial1/2<br>
+ no shutdown<br>
+ description to BR1 from ISP2<br>
+ ip vrf forwarding ISP2<br>
+ ip address 22.84.4.1 255.255.255.252<br>
+ serial restart-delay 0<br>
+ clock rate 64000<br>
+!<br>
+interface Serial1/3<br>
+ no shutdown<br>
+ no ip address<br>
+ shutdown<br>
+ serial restart-delay 0<br>
+!<br>
+router bgp 65001<br>
+ bgp router-id 8.8.8.8<br>
+ bgp log-neighbor-changes<br>
+ neighbor 100.22.5.1 remote-as 65001<br>
+ !<br>
+ address-family ipv4<br>
+  no neighbor 100.22.5.1 activate<br>
+ exit-address-family<br>
+ !<br>
+ address-family ipv4 vrf ISP1<br>
+  bgp router-id 8.8.8.8<br>
+  network 8.8.8.8 mask 255.255.255.255<br>
+  network 14.88.22.8 mask 255.255.255.255<br>
+  network 100.22.5.0 mask 255.255.255.252<br>
+  network 100.45.5.0 mask 255.255.255.252<br>
+  network 100.45.10.0 mask 255.255.255.252<br>
+  redistribute static<br>
+  neighbor 100.22.5.2 remote-as 65001<br>
+  neighbor 100.22.5.2 activate<br>
+  neighbor 100.45.5.2 remote-as 65010<br>
+  neighbor 100.45.5.2 activate<br>
+  neighbor 100.45.5.2 default-originate<br>
+  neighbor 100.45.10.2 remote-as 65000<br>
+  neighbor 100.45.10.2 activate<br>
+  neighbor 100.45.10.2 default-originate<br>
+ exit-address-family<br>
+ !<br>
+ address-family ipv4 vrf ISP2<br>
+  bgp router-id 78.88.8.8<br>
+  network 22.84.4.0 mask 255.255.255.252<br>
+  network 22.84.4.4 mask 255.255.255.252<br>
+  network 78.88.8.8 mask 255.255.255.255<br>
+  network 100.22.5.0 mask 255.255.255.252<br>
+  redistribute static<br>
+  neighbor 22.84.4.2 remote-as 65010<br>
+  neighbor 22.84.4.2 local-as 65002 no-prepend replace-as<br>
+  neighbor 22.84.4.2 activate<br>
+  neighbor 22.84.4.2 default-originate<br>
+  neighbor 22.84.4.6 remote-as 65000<br>
+  neighbor 22.84.4.6 local-as 65002 no-prepend replace-as<br>
+  neighbor 22.84.4.6 activate<br>
+  neighbor 22.84.4.6 default-originate<br>
+  neighbor 100.22.5.1 remote-as 65001<br>
+  neighbor 100.22.5.1 activate<br>
+ exit-address-family<br>
+!<br>
+ip local pool PPP 100.45.5.2<br>
+ip forward-protocol nd<br>
+!<br>
+!<br>
+no ip http server<br>
+no ip http secure-server<br>
+ip route vrf ISP1 0.0.0.0 0.0.0.0 Null0<br>
+ip route vrf ISP2 0.0.0.0 0.0.0.0 Null0<br>
+!<br>
+ipv6 ioam timestamp<br>
+!<br>
+!<br>
+!<br>
+!<br>
+!<br>
+control-plane<br>
+!<br>
+!<br>
+!<br>
+!<br>
+!<br>
+!<br>
+!<br>
+!<br>
+line con 0<br>
+ logging synchronous<br>
+line aux 0<br>
+line vty 0 4<br>
+ transport input none<br>
+!<br>
+!<br>
+end<br>
+@code {
+
+}

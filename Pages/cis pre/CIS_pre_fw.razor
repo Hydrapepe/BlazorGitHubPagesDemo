@@ -1,0 +1,42 @@
+@page "/Cis/Preconf/FW"
+enable<br>
+!<br>
+conf t<br>
+!<br>
+int g1/3<br>
+no nameif<br>
+bridge-group 1<br>
+nameif HQ1<br>
+no sh<br>
+!<br>
+int g1/4<br>
+no nameif<br>
+bridge-group 1<br>
+nameif BR1<br>
+no sh<br>
+!<br>
+int g1/5<br>
+no nameif<br>
+bridge-group 1<br>
+nameif inside_4<br>
+sec 100<br>
+no sh<br>
+<br>
+interface BVI 1<br>
+ ip add 192.168.254.2 255.255.255.0<br>
+!<br>
+enable password cisco<br>
+!<br>
+username cisco password cisco<br>
+!<br>
+aaa authentication telnet console LOCAL<br>
+!<br>
+telnet 192.168.254.0 255.255.255.0 inside_4<br>
+telnet 192.168.254.0 255.255.255.0 HQ1<br>
+telnet 192.168.254.0 255.255.255.0 BR1<br>
+!<br>
+end<br>
+wr<br>
+@code {
+
+}

@@ -1,0 +1,19 @@
+@page "/Cis/Preconf/SW1"
+enable<br>
+conf t<br>
+!<br>
+enable password cisco<br>
+!<br>
+line vty 0 4<br>
+ password cisco<br>
+ transport input telnet<br>
+!<br>
+int vlan 1<br>
+ ip add 192.168.254.10 255.255.255.0<br>
+ no sh<br>
+!<br>
+end<br>
+wr<br>
+@code {
+
+}
