@@ -1,0 +1,291 @@
+@page "/Cis/FW"
+<br>
+: <br>
+: Serial Number: 9A2E4Q9MGHV<br>
+: Hardware:   ASAv, 1024 MB RAM, CPU Unknown Model 4200 MHz<br>
+: Written by enable_15 at 11:13:45.939 UTC Sat Apr 3 2021<br>
+ASA Version 9.8(1) <br>
+!<br>
+hostname FW<br>
+domain-name worldkills.ru<br>
+enable password $sha512$5000$7f+jXlccY+Qeqot2tBi0Kw==$iwAJvVVptrPfGP0alDTDnQ== pbkdf2<br>
+xlate per-session deny tcp any4 any4<br>
+xlate per-session deny tcp any4 any6<br>
+xlate per-session deny tcp any6 any4<br>
+xlate per-session deny tcp any6 any6<br>
+xlate per-session deny udp any4 any4 eq domain<br>
+xlate per-session deny udp any4 any6 eq domain<br>
+xlate per-session deny udp any6 any4 eq domain<br>
+xlate per-session deny udp any6 any6 eq domain<br>
+names<br>
+<br>
+!<br>
+interface GigabitEthernet0/0<br>
+ nameif isp1<br>
+ security-level 100<br>
+ ip address 100.45.10.2 255.255.255.252 <br>
+!             <br>
+interface GigabitEthernet0/1 <br>
+ip address 22.84.4.6 255.255.255.252<br>
+security-level 100<br>
+nameif ISP2<br>
+no sh<br>
+!    <br>
+interface GigabitEthernet0/2<br>
+ shutdown     <br>
+ no nameif    <br>
+ no security-level<br>
+ no ip address<br>
+!             <br>
+interface GigabitEthernet0/3<br>
+ no nameif    <br>
+ security-level 100<br>
+ no ip address<br>
+!             <br>
+interface GigabitEthernet0/3.10<br>
+ vlan 11      <br>
+ bridge-group 2<br>
+  nameif downtt<br>
+ security-level 100<br>
+!             <br>
+interface GigabitEthernet0/3.20<br>
+ vlan 20      <br>
+ bridge-group 20<br>
+ nameif HQtop <br>
+ security-level 100<br>
+!             <br>
+interface GigabitEthernet0/4<br>
+ no nameif    <br>
+ security-level 100<br>
+ no ip address<br>
+!             <br>
+interface GigabitEthernet0/4.10<br>
+ vlan 10      <br>
+ bridge-group 2<br>
+ nameif toptr <br>
+ security-level 100<br>
+!             <br>
+interface GigabitEthernet0/5<br>
+ shutdown     <br>
+ bridge-group 1<br>
+ nameif inside_4<br>
+ security-level 100<br>
+!             <br>
+interface GigabitEthernet0/6<br>
+ shutdown     <br>
+ no nameif    <br>
+ no security-level<br>
+ no ip address<br>
+!             <br>
+interface Management0/0<br>
+ shutdown     <br>
+ no nameif    <br>
+ no security-level<br>
+ no ip address<br>
+!             <br>
+interface BVI1<br>
+ no nameif    <br>
+ no security-level<br>
+ ip address 192.168.254.2 255.255.255.0 <br>
+!             <br>
+interface BVI2<br>
+ nameif vpn   <br>
+ security-level 100<br>
+ ip address 172.16.3.2 255.255.255.0 <br>
+ ipv6 address 2001:4::2/64<br>
+ ipv6 enable  <br>
+!             <br>
+interface BVI20<br>
+ nameif hq    <br>
+ security-level 100<br>
+ ip address 30.78.87.2 255.255.255.248 <br>
+ ipv6 address 2001:3::2/64<br>
+ ipv6 enable  <br>
+!         <br>
+ftp mode passive<br>
+clock timezone MSK 3<br>
+dns server-group DefaultDNS<br>
+ domain-name worldkills.ru<br>
+same-security-traffic permit inter-interface<br>
+same-security-traffic permit intra-interface<br>
+pager lines 23<br>
+mtu isp1 1500 <br>
+mtu isp22 1500<br>
+mtu downtt 1500<br>
+mtu HQtop 1500<br>
+mtu toptr 1500<br>
+mtu inside_4 1500<br>
+no failover   <br>
+no monitor-interface vpn<br>
+no monitor-interface hq<br>
+no monitor-interface service-module <br>
+icmp unreachable rate-limit 1 burst-size 1<br>
+no asdm history enable<br>
+arp timeout 14400<br>
+no arp permit-nonconnected<br>
+arp rate-limit 8192<br>
+router bgp 65000<br>
+ bgp log-neighbor-changes<br>
+ address-family ipv4 unicast<br>
+  neighbor 100.45.10.1 remote-as 65001<br>
+  neighbor 100.45.10.1 activate<br>
+  neighbor 30.78.87.1 remote-as 65000<br>
+  neighbor 30.78.87.1 activate<br>
+  neighbor 22.84.4.5 remote-as 65002<br>
+  neighbor 22.84.4.5 activate<br>
+  network 100.45.10.0 mask 255.255.255.252<br>
+  network 30.78.87.0 mask 255.255.255.248<br>
+  network 22.84.4.4 mask 255.255.255.252<br>
+  no auto-summary<br>
+  no synchronization<br>
+ exit-address-family<br>
+!             <br>
+router ospf 1 <br>
+ network 172.16.3.0 255.255.255.0 area 0<br>
+ log-adj-changes<br>
+!             <br>
+timeout xlate 3:00:00<br>
+timeout pat-xlate 0:00:30<br>
+timeout conn 1:00:00 half-closed 0:10:00 udp 0:02:00 sctp 0:02:00 icmp 0:00:02<br>
+timeout sunrpc 0:10:00 h323 0:05:00 h225 1:00:00 mgcp 0:05:00 mgcp-pat 0:05:00<br>
+timeout sip 0:30:00 sip_media 0:02:00 sip-invite 0:03:00 sip-disconnect 0:02:00<br>
+timeout sip-provisional-media 0:02:00 uauth 0:05:00 absolute<br>
+timeout tcp-proxy-reassembly 0:01:00<br>
+timeout floating-conn 0:00:00<br>
+timeout conn-holddown 0:00:15<br>
+timeout igp stale-route 0:01:10<br>
+user-identity default-domain LOCAL<br>
+aaa authentication telnet console LOCAL <br>
+aaa authentication enable console LOCAL <br>
+aaa authentication ssh console LOCAL <br>
+aaa authorization exec LOCAL <br>
+aaa authentication login-history<br>
+no snmp-server location<br>
+no snmp-server contact<br>
+crypto ipsec security-association pmtu-aging infinite<br>
+crypto ca trustpoint _SmartCallHome_ServerCA<br>
+ no validation-usage<br>
+ crl configure<br>
+crypto ca trustpool policy<br>
+ auto-import<br>
+crypto ca certificate chain _SmartCallHome_ServerCA<br>
+ certificate ca 18dad19e267de8bb4a2158cdcc6b3b4a<br>
+    308204d3 308203bb a0030201 02021018 dad19e26 7de8bb4a 2158cdcc 6b3b4a30 <br>
+    0d06092a 864886f7 0d010105 05003081 ca310b30 09060355 04061302 55533117 <br>
+    30150603 55040a13 0e566572 69536967 6e2c2049 6e632e31 1f301d06 0355040b <br>
+    13165665 72695369 676e2054 72757374 204e6574 776f726b 313a3038 06035504 <br>
+    0b133128 63292032 30303620 56657269 5369676e 2c20496e 632e202d 20466f72 <br>
+    20617574 686f7269 7a656420 75736520 6f6e6c79 31453043 06035504 03133c56 <br>
+    65726953 69676e20 436c6173 73203320 5075626c 69632050 72696d61 72792043 <br>
+    65727469 66696361 74696f6e 20417574 686f7269 7479202d 20473530 1e170d30 <br>
+    36313130 38303030 3030305a 170d3336 30373136 32333539 35395a30 81ca310b <br>
+    30090603 55040613 02555331 17301506 0355040a 130e5665 72695369 676e2c20 <br>
+    496e632e 311f301d 06035504 0b131656 65726953 69676e20 54727573 74204e65 <br>
+    74776f72 6b313a30 38060355 040b1331 28632920 32303036 20566572 69536967 <br>
+    6e2c2049 6e632e20 2d20466f 72206175 74686f72 697a6564 20757365 206f6e6c <br>
+    79314530 43060355 0403133c 56657269 5369676e 20436c61 73732033 20507562 <br>
+    6c696320 5072696d 61727920 43657274 69666963 6174696f 6e204175 74686f72 <br>
+    69747920 2d204735 30820122 300d0609 2a864886 f70d0101 01050003 82010f00 <br>
+    3082010a 02820101 00af2408 08297a35 9e600caa e74b3b4e dc7cbc3c 451cbb2b <br>
+    e0fe2902 f95708a3 64851527 f5f1adc8 31895d22 e82aaaa6 42b38ff8 b955b7b1 <br>
+    b74bb3fe 8f7e0757 ecef43db 66621561 cf600da4 d8def8e0 c362083d 5413eb49 <br>
+    ca595485 26e52b8f 1b9febf5 a191c233 49d84363 6a524bd2 8fe87051 4dd18969 <br>
+    7bc770f6 b3dc1274 db7b5d4b 56d396bf 1577a1b0 f4a225f2 af1c9267 18e5f406 <br>
+    04ef90b9 e400e4dd 3ab519ff 02baf43c eee08beb 378becf4 d7acf2f6 f03dafdd <br>
+    75913319 1d1c40cb 74241921 93d914fe ac2a52c7 8fd50449 e48d6347 883c6983 <br>
+    cbfe47bd 2b7e4fc5 95ae0e9d d4d143c0 6773e314 087ee53f 9f73b833 0acf5d3f <br>
+    3487968a ee53e825 15020301 0001a381 b23081af 300f0603 551d1301 01ff0405 <br>
+    30030101 ff300e06 03551d0f 0101ff04 04030201 06306d06 082b0601 05050701 <br>
+    0c046130 5fa15da0 5b305930 57305516 09696d61 67652f67 69663021 301f3007 <br>
+    06052b0e 03021a04 148fe5d3 1a86ac8d 8e6bc3cf 806ad448 182c7b19 2e302516 <br>
+    23687474 703a2f2f 6c6f676f 2e766572 69736967 6e2e636f 6d2f7673 6c6f676f <br>
+    2e676966 301d0603 551d0e04 1604147f d365a7c2 ddecbbf0 3009f343 39fa02af <br>
+    33313330 0d06092a 864886f7 0d010105 05000382 01010093 244a305f 62cfd81a <br>
+    982f3dea dc992dbd 77f6a579 2238ecc4 a7a07812 ad620e45 7064c5e7 97662d98 <br>
+    097e5faf d6cc2865 f201aa08 1a47def9 f97c925a 0869200d d93e6d6e 3c0d6ed8 <br>
+    e6069140 18b9f8c1 eddfdb41 aae09620 c9cd6415 3881c994 eea28429 0b136f8e <br>
+    db0cdd25 02dba48b 1944d241 7a05694a 584f60ca 7e826a0b 02aa2517 39b5db7f <br>
+    e784652a 958abd86 de5e8116 832d10cc defda882 2a6d281f 0d0bc4e5 e71a2619 <br>
+    e1f4116f 10b595fc e7420532 dbce9d51 5e28b69e 85d35bef a57d4540 728eb70e <br>
+    6b0e06fb 33354871 b89d278b c4655f0d 86769c44 7af6955c f65d3208 33a454b6 <br>
+    183f685c f2424a85 3854835f d1e82cf2 ac11d6a8 ed636a<br>
+  quit<br>
+telnet 30.78.0.0 255.255.255.0 HQtop<br>
+telnet 30.78.87.0 255.255.255.248 HQtop<br>
+telnet 192.168.254.0 255.255.255.0 inside_4<br>
+telnet timeout 5<br>
+ssh stricthostkeycheck<br>
+ssh 30.78.0.0 255.255.255.0 HQtop<br>
+ssh 30.78.87.0 255.255.255.248 HQtop<br>
+ssh timeout 5<br>
+ssh version 2 <br>
+ssh key-exchange group dh-group1-sha1<br>
+console timeout 0<br>
+threat-detection basic-threat<br>
+threat-detection statistics access-list<br>
+no threat-detection statistics tcp-intercept<br>
+ntp server 172.16.20.20<br>
+dynamic-access-policy-record DfltAccessPolicy<br>
+username wsruser password $sha512$5000$cuIah8a7Hw9QufYGs0P6Bw==$6qHajaaO+QPZPXMKNdCGIw== pbkdf2 privilege 15<br>
+username cisco password $sha512$5000$F0sEVoSeQqqL2ZRBmgfrtQ==$G/eIzii3qQlBukGkXggUwA== pbkdf2<br>
+!             <br>
+class-map inspection_default<br>
+ match default-inspection-traffic<br>
+!             <br>
+!             <br>
+policy-map type inspect dns preset_dns_map<br>
+ parameters   <br>
+  message-length maximum client auto<br>
+  message-length maximum 512<br>
+  no tcp-inspection<br>
+policy-map global_policy<br>
+ class inspection_default<br>
+  inspect ip-options <br>
+  inspect netbios <br>
+  inspect rtsp <br>
+  inspect sunrpc <br>
+  inspect tftp <br>
+  inspect xdmcp <br>
+  inspect dns preset_dns_map <br>
+  inspect ftp <br>
+  inspect h323 h225 <br>
+  inspect h323 ras <br>
+  inspect rsh <br>
+  inspect esmtp <br>
+  inspect sqlnet <br>
+  inspect sip  <br>
+  inspect skinny  <br>
+policy-map type inspect dns migrated_dns_map_2<br>
+ parameters   <br>
+  message-length maximum client auto<br>
+  message-length maximum 512<br>
+  no tcp-inspection<br>
+policy-map type inspect dns migrated_dns_map_1<br>
+ parameters   <br>
+  message-length maximum client auto<br>
+  message-length maximum 512<br>
+  no tcp-inspection<br>
+!             <br>
+service-policy global_policy global<br>
+prompt hostname context <br>
+no call-home reporting anonymous<br>
+call-home     <br>
+ profile CiscoTAC-1<br>
+  no active   <br>
+  destination address http https://tools.cisco.com/its/service/oddce/services/DDCEService<br>
+  destination address email callhome@cisco.com<br>
+  destination transport-method http<br>
+  subscribe-to-alert-group diagnostic<br>
+  subscribe-to-alert-group environment<br>
+  subscribe-to-alert-group inventory periodic monthly<br>
+  subscribe-to-alert-group configuration periodic monthly<br>
+  subscribe-to-alert-group telemetry periodic daily<br>
+ profile License<br>
+  destination address http https://tools.cisco.com/its/service/oddce/services/DDCEService<br>
+  destination transport-method http<br>
+password encryption aes<br>
+Cryptochecksum:e6b9a85536160ebc53b9e43db33c8d8f<br>
+: end<br>
+@code {
+
+}

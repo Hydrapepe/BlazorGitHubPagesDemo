@@ -1,0 +1,241 @@
+@page "/Cis/SW2"
+!<br>
+! Last configuration change at 12:45:13 MSK Sat Apr 3 2021<br>
+!<br>
+version 15.2<br>
+service timestamps debug datetime msec<br>
+service timestamps log datetime msec<br>
+no service password-encryption<br>
+service compress-config<br>
+!<br>
+hostname SW2<br>
+!<br>
+boot-start-marker<br>
+boot-end-marker<br>
+!<br>
+!<br>
+enable password wsr<br>
+!<br>
+username wsruser privilege 15 secret 5 $1$kom3$CY7ZdOB8UKxFAeYx9YtWZ0<br>
+aaa new-model<br>
+!<br>
+!<br>
+aaa authentication login default local<br>
+aaa authorization console<br>
+aaa authorization exec default local<br>
+!<br>
+!<br>
+!<br>
+!<br>
+!<br>
+!<br>
+aaa session-id common<br>
+clock timezone MSK 3 0<br>
+!<br>
+!<br>
+!<br>
+!<br>
+!<br>
+!<br>
+!<br>
+!<br>
+ip domain-name worldskills.ru<br>
+ip cef<br>
+no ipv6 cef<br>
+password encryption aes<br>
+!<br>
+!<br>
+!<br>
+spanning-tree mode pvst<br>
+spanning-tree extend system-id<br>
+spanning-tree vlan 100,200,300 priority 28672<br>
+!<br>
+!<br>
+!<br>
+!<br>
+!<br>
+!<br>
+!<br>
+!<br>
+!<br>
+!<br>
+!<br>
+!<br>
+!<br>
+!<br>
+!<br>
+interface Port-channel1<br>
+ switchport trunk allowed vlan 100,200,300,500,600<br>
+ switchport trunk encapsulation dot1q<br>
+ switchport trunk native vlan 500<br>
+!<br>
+interface Ethernet0/0<br>
+ switchport access vlan 300<br>
+ switchport trunk encapsulation dot1q<br>
+ switchport mode access<br>
+ switchport nonegotiate<br>
+ switchport port-security maximum 2<br>
+ switchport port-security violation restrict<br>
+ switchport port-security mac-address sticky<br>
+!<br>
+interface Ethernet0/1<br>
+ switchport access vlan 600<br>
+ switchport trunk encapsulation dot1q<br>
+ switchport mode access<br>
+ shutdown<br>
+!<br>
+interface Ethernet0/2<br>
+ switchport trunk allowed vlan 100,200,300,500,600<br>
+ switchport trunk encapsulation dot1q<br>
+ switchport trunk native vlan 500<br>
+ switchport mode trunk<br>
+ switchport nonegotiate<br>
+!<br>
+interface Ethernet0/3<br>
+ switchport access vlan 600<br>
+ switchport trunk encapsulation dot1q<br>
+ switchport mode access<br>
+ shutdown<br>
+!<br>
+interface Ethernet1/0<br>
+ switchport trunk allowed vlan 100,200,300,500,600<br>
+ switchport trunk encapsulation dot1q<br>
+ switchport trunk native vlan 500<br>
+ channel-group 1 mode passive<br>
+!<br>
+interface Ethernet1/1<br>
+ switchport trunk allowed vlan 100,200,300,500,600<br>
+ switchport trunk encapsulation dot1q<br>
+ switchport trunk native vlan 500<br>
+ channel-group 1 mode passive<br>
+!<br>
+interface Ethernet1/2<br>
+ switchport access vlan 600<br>
+ switchport trunk encapsulation dot1q<br>
+ switchport mode access<br>
+ shutdown<br>
+!<br>
+interface Ethernet1/3<br>
+ switchport access vlan 600<br>
+ switchport trunk encapsulation dot1q<br>
+ switchport mode access<br>
+ shutdown<br>
+!<br>
+interface Ethernet2/0<br>
+ switchport access vlan 600<br>
+ switchport mode access<br>
+ shutdown<br>
+!<br>
+interface Ethernet2/1<br>
+ switchport access vlan 600<br>
+ switchport mode access<br>
+ shutdown<br>
+!<br>
+interface Ethernet2/2<br>
+ switchport access vlan 600<br>
+ switchport mode access<br>
+ shutdown<br>
+!<br>
+interface Ethernet2/3<br>
+ switchport access vlan 600<br>
+ switchport mode access<br>
+ shutdown<br>
+!<br>
+interface Ethernet3/0<br>
+ switchport access vlan 600<br>
+ switchport mode access<br>
+ shutdown<br>
+!<br>
+interface Ethernet3/1<br>
+ switchport access vlan 600<br>
+ switchport mode access<br>
+ shutdown<br>
+!<br>
+interface Ethernet3/2<br>
+ switchport access vlan 600<br>
+ switchport mode access<br>
+ shutdown<br>
+!<br>
+interface Ethernet3/3<br>
+ switchport access vlan 600<br>
+ switchport mode access<br>
+ shutdown<br>
+!<br>
+interface Ethernet4/0<br>
+ switchport access vlan 600<br>
+ switchport mode access<br>
+ shutdown<br>
+!<br>
+interface Ethernet4/1<br>
+ switchport access vlan 600<br>
+ switchport mode access<br>
+ shutdown<br>
+!<br>
+interface Ethernet4/2<br>
+ switchport access vlan 600<br>
+ switchport mode access<br>
+ shutdown<br>
+!<br>
+interface Ethernet4/3<br>
+ switchport access vlan 600<br>
+ switchport mode access<br>
+ shutdown<br>
+!<br>
+interface Ethernet5/0<br>
+ switchport access vlan 600<br>
+ switchport mode access<br>
+ shutdown<br>
+!<br>
+interface Ethernet5/1<br>
+ switchport access vlan 600<br>
+ switchport mode access<br>
+ shutdown<br>
+!<br>
+interface Ethernet5/2<br>
+ switchport access vlan 600<br>
+ switchport mode access<br>
+ shutdown<br>
+!<br>
+interface Ethernet5/3<br>
+ switchport access vlan 600<br>
+ switchport mode access<br>
+ shutdown<br>
+!<br>
+interface Vlan1<br>
+ ip address 192.168.254.20 255.255.255.0<br>
+!<br>
+interface Vlan100<br>
+ ip address 10.100.100.20 255.255.255.0<br>
+!<br>
+ip default-gateway 10.100.100.1<br>
+ip forward-protocol nd<br>
+!<br>
+ip http server<br>
+!<br>
+ip ssh version 2<br>
+ip ssh server algorithm encryption aes128-ctr aes192-ctr aes256-ctr<br>
+ip ssh client algorithm encryption aes128-ctr aes192-ctr aes256-ctr<br>
+!<br>
+!<br>
+!<br>
+!<br>
+!<br>
+!<br>
+!<br>
+control-plane<br>
+!<br>
+!<br>
+line con 0<br>
+ logging synchronous<br>
+line aux 0<br>
+line vty 0 4<br>
+ password cisco<br>
+ transport input all<br>
+!<br>
+ntp server 172.16.20.20<br>
+!<br>
+!<br>
+end<br>
+@code {
+
+}

@@ -1,0 +1,242 @@
+@page "/Cis/BR"
+!<br>
+! Last configuration change at 12:21:38 MSK Sat Apr 3 2021<br>
+!<br>
+version 15.7<br>
+service timestamps debug datetime msec<br>
+service timestamps log datetime msec<br>
+no service password-encryption<br>
+!<br>
+hostname BR1<br>
+!<br>
+boot-start-marker<br>
+boot-end-marker<br>
+!<br>
+!<br>
+enable password wsr<br>
+!<br>
+aaa new-model<br>
+!<br>
+!<br>
+aaa authentication login default local<br>
+aaa authorization console<br>
+aaa authorization exec default local <br>
+!         <br>
+!         <br>
+!         <br>
+!         <br>
+!         <br>
+aaa session-id common<br>
+!         <br>
+!         <br>
+!         <br>
+clock timezone MSK 3 0<br>
+mmi polling-interval 60<br>
+no mmi auto-configure<br>
+no mmi pvc<br>
+mmi snmp-timeout 180<br>
+!         <br>
+!         <br>
+!         <br>
+!         <br>
+!         <br>
+!         <br>
+!         <br>
+!         <br>
+!<br>
+ip domain name worldskills.ru<br>
+ip cef    <br>
+ipv6 unicast-routing<br>
+ipv6 cef  <br>
+!         <br>
+multilink bundle-name authenticated<br>
+!         <br>
+!         <br>
+password encryption aes<br>
+!         <br>
+!         <br>
+!         <br>
+!         <br>
+!         <br>
+!         <br>
+!         <br>
+username wsruser privilege 15 secret 5 $1$04/v$WRLcQWLjWkmpK3MQYCwth/<br>
+username user1 privilege 5 password 0 cisco<br>
+username user2 view view_sh password 0 cisco<br>
+username pc2user password 0 pc2pass<br>
+!         <br>
+redundancy<br>
+!         <br>
+!         <br>
+!         <br>
+!         <br>
+!         <br>
+!         <br>
+!         <br>
+crypto isakmp policy 1<br>
+ encr 3des<br>
+ hash sha256<br>
+ authentication pre-share<br>
+ group 5  <br>
+crypto isakmp key 6 bLHJAJDKNIa]GgbHPLCcT_dX^WfGTfAQBggNXTIOJIDCLW_hBFTAAB address 1.1.1.1        <br>
+!         <br>
+!         <br>
+crypto ipsec transform-set vpn esp-3des esp-sha256-hmac <br>
+ mode tunnel<br>
+!         <br>
+!         <br>
+crypto ipsec profile vpnp<br>
+ set transform-set vpn<br>
+!<br>
+!         <br>
+!         <br>
+!         <br>
+!         <br>
+bba-group pppoe global<br>
+ virtual-template 1<br>
+!         <br>
+!         <br>
+interface Loopback0<br>
+ ip address 3.3.3.3 255.255.255.255<br>
+ ipv6 address 2001:A:B:3::1/64<br>
+ ipv6 enable<br>
+ ipv6 eigrp 6000<br>
+!         <br>
+interface Tunnel1<br>
+ ip address 172.16.1.2 255.255.255.0<br>
+ tunnel source 3.3.3.3<br>
+ tunnel destination 1.1.1.1<br>
+!         <br>
+interface Multilink1<br>
+ ip address negotiated<br>
+ ppp multilink<br>
+ ppp multilink group 1<br>
+!         <br>
+interface Ethernet0/0<br>
+ ip address 192.168.254.3 255.255.255.0<br>
+ duplex auto<br>
+!         <br>
+interface Ethernet0/0.10<br>
+ encapsulation dot1Q 10<br>
+ ip address 172.16.3.3 255.255.255.0<br>
+ ipv6 address 2001:4::2/64<br>
+ ipv6 address 2001:4::3/64<br>
+ ipv6 enable<br>
+ ipv6 eigrp 6000<br>
+!         <br>
+interface Ethernet0/1<br>
+ ip address 192.168.2.1 255.255.255.0<br>
+ duplex auto<br>
+ ipv6 address 2001:A:B:ACAD::1/64<br>
+ ipv6 enable<br>
+ ipv6 eigrp 6000<br>
+ pppoe enable group global<br>
+!<br>
+!         <br>
+interface Ethernet0/1.20<br>
+!         <br>
+interface Ethernet0/2<br>
+ no ip address<br>
+ shutdown <br>
+ duplex auto<br>
+!         <br>
+interface Ethernet0/3<br>
+ no ip address<br>
+ shutdown <br>
+ duplex auto<br>
+!         <br>
+interface Serial1/0<br>
+ no ip address<br>
+ encapsulation ppp<br>
+ ppp multilink<br>
+ ppp multilink group 1<br>
+ serial restart-delay 0<br>
+!         <br>
+interface Serial1/1<br>
+ no ip address<br>
+ encapsulation ppp<br>
+ ppp multilink<br>
+ ppp multilink group 1<br>
+ serial restart-delay 0<br>
+!         <br>
+interface Serial1/2<br>
+ ip address 22.84.4.2 255.255.255.252<br>
+ serial restart-delay 0<br>
+!         <br>
+interface Serial1/3<br>
+ no ip address<br>
+ shutdown <br>
+ serial restart-delay 0<br>
+!         <br>
+interface Virtual-Template1<br>
+ mtu 1492 <br>
+ ip unnumbered Ethernet0/1<br>
+ peer default ip address pool PC2<br>
+ ppp authentication chap ms-chap-v2<br>
+!         <br>
+router ospf 1<br>
+ passive-interface default<br>
+ no passive-interface Ethernet0/0.10<br>
+ no passive-interface Tunnel1<br>
+ etwork 172.16.3.0 0.0.0.255 area 0<br>
+ network 192.168.2.0 0.0.0.255 area 1<br>
+!         <br>
+router bgp 65010<br>
+ bgp log-neighbor-changes<br>
+ network 3.3.3.3 mask 255.255.255.255<br>
+ network 22.84.4.0 mask 255.255.255.252<br>
+ network 100.45.5.0 mask 255.255.255.252<br>
+ neighbor 22.84.4.1 remote-as 65002<br>
+ neighbor 100.45.5.1 remote-as 65001<br>
+!         <br>
+ip local pool PC2 192.168.2.0<br>
+ip local pool PC2 192.168.2.10<br>
+ip forward-protocol nd<br>
+!         <br>
+!         <br>
+no ip http server<br>
+no ip http secure-server<br>
+ip ssh version 2<br>
+!         <br>
+ipv6 router eigrp 6000<br>
+!         <br>
+ipv6 ioam timestamp<br>
+!         <br>
+!         <br>
+!         <br>
+!         <br>
+!         <br>
+control-plane<br>
+!         <br>
+!         <br>
+!         <br>
+!         <br>
+!         <br>
+!         <br>
+!         <br>
+privilege exec level 5 reload<br>
+privilege exec level 5 undebug<br>
+privilege exec level 5 debug<br>
+parser view view_sh<br>
+ secret 5 $1$fHu0$cQQxrXHyFMcZ/5PR2kpkN/<br>
+ commands exec include traceroute<br>
+ commands exec include ping<br>
+ commands exec include all show ip<br>
+  commands exec include show cdp neighbors<br>
+ commands exec include show cdp<br>
+ commands exec include show<br>
+!         <br>
+!         <br>
+line con 0<br>
+ logging synchronous<br>
+line aux 0<br>
+line vty 0 4<br>
+ password cisco<br>
+ transport input all<br>
+!         <br>
+ntp server 172.16.20.20<br>
+!         <br>
+end<br>
+@code {
+
+}

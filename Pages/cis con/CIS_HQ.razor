@@ -1,0 +1,205 @@
+@page "/Cis/HQ"
+!<br>
+version 15.7<br>
+service timestamps debug datetime msec<br>
+service timestamps log datetime msec<br>
+no service password-encryption<br>
+!<br>
+hostname HQ1<br>
+!<br>
+boot-start-marker<br>
+boot-end-marker<br>
+!<br>
+!<br>
+enable password wsr<br>
+!<br>
+aaa new-model<br>
+!<br>
+!<br>
+aaa authentication login default local<br>
+aaa authorization console<br>
+aaa authorization exec default local <br>
+!<br>
+!         <br>
+!         <br>
+!         <br>
+!         <br>
+aaa session-id common<br>
+!         <br>
+!         <br>
+!         <br>
+clock timezone MSK 3 0<br>
+mmi polling-interval 60<br>
+no mmi auto-configure<br>
+no mmi pvc<br>
+mmi snmp-timeout 180<br>
+!<br>
+!<br>
+ip dhcp pool pool1<br>
+ host 30.78.21.10 255.255.255.0<br>
+ client-identifier 0150.0000.0700.00<br>
+ default-router 30.78.21.1 <br>
+ option 150 ip 172.16.20.20 <br>
+!         <br>
+!         <br>
+!         <br>
+ip domain name worldskills.ru<br>
+ip cef    <br>
+ipv6 unicast-routing<br>
+ipv6 cef  <br>
+!         <br>
+multilink bundle-name authenticated<br>
+!         <br>
+!         <br>
+password encryption aes<br>
+!         <br>
+!         <br>
+!         <br>
+!         <br>
+!         <br>
+!         <br>
+!         <br>
+username wsruser privilege 15 secret 5 $1$bUPX$la1j3z4kxEiJBeONXg3ac.<br>
+!         <br>
+redundancy<br>
+!         <br>
+!         <br>
+!         <br>
+!         <br>
+!         <br>
+!         <br>
+!         <br>
+crypto isakmp policy 1<br>
+ encr 3des<br>
+ hash sha256<br>
+ authentication pre-share<br>
+ group 5  <br>
+crypto isakmp key 6 ULaOYHOJCLfVJBL\TacDIJAJfQALSdULAd\KZefSWJPgfL[^GWU address 3.3.3.3        <br>
+!         <br>
+!         <br>
+crypto ipsec transform-set vpn esp-3des esp-sha256-hmac <br>
+ mode tunnel<br>
+ !         <br>
+!         <br>
+crypto ipsec profile vpnp<br>
+ set transform-set vpn <br>
+!         <br>
+!         <br>
+!         <br>
+!         <br>
+!         <br>
+!         <br>
+interface Loopback0<br>
+ ip address 1.1.1.1 255.255.255.255<br>
+ ipv6 address 2001:A:B:1::1/64<br>
+ ipv6 enable<br>
+ ipv6 eigrp 6000<br>
+!         <br>
+interface Tunnel1<br>
+ ip address 172.16.1.1 255.255.255.0<br>
+ tunnel source 1.1.1.1<br>
+ tunnel destination 3.3.3.3<br>
+!         <br>
+interface Tunnel2<br>
+ no ip address<br>
+!         <br>
+interface Ethernet0/0<br>
+ no ip address<br>
+ duplex auto<br>
+!         <br>
+interface Ethernet0/0.11<br>
+ encapsulation dot1Q 11<br>
+ ip address 172.16.3.1 255.255.255.0<br>
+ ipv6 address 2001:4::1/64<br>
+ ipv6 enable<br>
+ ipv6 eigrp 6000<br>
+!         <br>
+interface Ethernet0/0.20<br>
+ encapsulation dot1Q 20<br>
+ ip address 30.78.87.1 255.255.255.0<br>
+ ipv6 address 2001:3::1/64<br>
+ ipv6 enable<br>
+ ipv6 eigrp 6000<br>
+!         <br>
+interface Ethernet0/1<br>
+ ip address 192.168.254.1 255.255.255.0<br>
+ duplex auto<br>
+!<br>
+!         <br>
+interface Ethernet0/1.100<br>
+ encapsulation dot1Q 100<br>
+ ip address 10.100.100.1 255.255.255.0<br>
+!         <br>
+interface Ethernet0/1.200<br>
+ encapsulation dot1Q 200<br>
+ ip address 172.16.20.1 255.255.255.0<br>
+!         <br>
+interface Ethernet0/1.300<br>
+ encapsulation dot1Q 300<br>
+ ip address 30.78.21.1 255.255.255.0<br>
+ ipv6 address 2001:A:B:DEAD::1/64<br>
+ ipv6 enable<br>
+ ipv6 eigrp 6000<br>
+!         <br>
+interface Ethernet0/2<br>
+ no ip address<br>
+ shutdown <br>
+ duplex auto<br>
+!         <br>
+interface Ethernet0/3<br>
+ no ip address<br>
+ shutdown <br>
+ duplex auto<br>
+!         <br>
+router ospf 1<br>
+ passive-interface default<br>
+ no passive-interface Ethernet0/0.11<br>
+ no passive-interface Tunnel1<br>
+ network 10.100.100.0 0.0.0.255 area 51<br>
+ network 172.16.1.0 0.0.0.255 area 0<br>
+ network 172.16.3.0 0.0.0.255 area 0<br>
+ network 172.16.20.0 0.0.0.255 area 51<br>
+!         <br>
+router bgp 65000<br>
+ bgp log-neighbor-changes<br>
+ network 1.1.1.1 mask 255.255.255.255<br>
+ network 30.78.21.0 mask 255.255.255.0<br>
+ network 30.78.87.0 mask 255.255.255.248<br>
+ neighbor 30.78.87.2 remote-as 65000<br>
+!         <br>
+ip forward-protocol nd<br>
+!         <br>
+!         <br>
+no ip http server<br>
+ip ssh version 2<br>
+!         <br>
+ipv6 router eigrp 6000<br>
+!         <br>
+ipv6 ioam timestamp<br>
+!         <br>
+!         <br>
+!         <br>
+!         <br>
+!         <br>
+control-plane<br>
+!         <br>
+!         <br>
+!         <br>
+!         <br>
+!         <br>
+!         <br>
+!         <br>
+!         <br>
+line con 0<br>
+ logging synchronous<br>
+line aux 0<br>
+line vty 0 4<br>
+ password cisco<br>
+ transport input all<br>
+!         <br>
+ntp server 172.16.20.20<br>
+!         <br>
+end<br>
+@code {
+
+}
